@@ -77,15 +77,14 @@ class DatabaseUtil:
                 connection.close()
 
 
-obj = DatabaseUtil({
-    "host": "localhost",
-    "port": 5432,
-    "user": "postgres",
-    "password": "potgres",
-    "dbname": "postgres"
-})
+if __name__ == "__main__":
+    obj = DatabaseUtil({
+        "host": "localhost",
+        "port": 5432,
+        "user": "postgres",
+        "password": "postgres",
+        "dbname": "postgres"
+    })
 
-result = obj.schema_details("public")
-
-with open("test_schema_details.txt", "w") as f:
-    f.write(result)
+    result = obj.schema_details("public")
+    print(result)
