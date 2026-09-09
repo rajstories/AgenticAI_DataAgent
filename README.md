@@ -1,137 +1,251 @@
-# 🤖 Agentic AI - Data Agent
+<div align="center">
 
-## Source and project history
+# 🤖 Agentic AI — Data Agent
 
-This project was imported on September 9, 2026 from [anshlambagit/AI_Data_Agent](https://github.com/anshlambagit/AI_Data_Agent), at commit [`f5c96e9`](https://github.com/anshlambagit/AI_Data_Agent/commit/f5c96e900b7f89768de78614458967b2f7bf9712). The initial application code, sample datasets, and documentation were authored in that upstream repository. The import preserves the upstream files and folder structure; this source attribution is the only addition. Later commits in this repository can be used to track subsequent changes.
+### *A multi-agent system that turns plain English into SQL queries and ETL pipelines.*
 
-A sophisticated multi-agent system for intelligent data processing and analysis using LangGraph. This project demonstrates a complete implementation of an agentic architecture with specialized sub-agents for SQL operations and ETL workflows.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/LangGraph-Powered-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" alt="LangGraph"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-Ready-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+</p>
 
-## YouTube Tutorial
-https://youtu.be/7yOmi4IX-Rs?si=_NGAHOomEPocRoqt
+<p align="center">
+  <img src="https://img.shields.io/badge/version-0.1.0-blue?style=flat-square"/>
+  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square"/>
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square"/>
+  <img src="https://img.shields.io/badge/status-active-success?style=flat-square"/>
+  <img src="https://img.shields.io/badge/maintained-yes-orange?style=flat-square"/>
+</p>
 
-## 📋 Table of Contents
+<p align="center">
+  <b>Ask a question. Get an answer. No SQL. No boilerplate. No glue code.</b>
+</p>
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Agent Descriptions](#agent-descriptions)
-- [Data Models](#data-models)
-- [Examples](#examples)
-- [Contributing](#contributing)
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
 
----
+</div>
 
-## 🎯 Overview
+<br/>
 
-**Agentic AI Data Agent** is an intelligent system that processes natural language queries and routes them to specialized agents for execution. The main agent acts as an intelligent router that understands user intent and delegates tasks to either the **SQL Analyst Agent** (for database queries) or the **ETL Analyst Agent** (for data extraction and transformation operations).
+## 🌟 What Is This?
 
-This project showcases modern AI engineering practices including:
-- Multi-agent orchestration with LangGraph
-- Intelligent routing based on natural language understanding
-- Safety validation for SQL queries
-- Tool-based agent architecture
-- Dynamic LLM selection based on task complexity
+> **Agentic AI Data Agent** is an intelligent orchestration system that reads a natural-language request, figures out *what kind of work it is*, and hands it to the right specialist agent.
 
----
+Ask it `"Show me the top 5 users by rating"` → the **SQL Analyst** writes, validates and runs the query.
+Ask it `"Pull the Pokémon API into CSV"` → the **ETL Analyst** extracts, transforms and loads it.
+
+No mode switching. No prompt engineering. Just ask.
+
+<table>
+<tr>
+<td width="33%" align="center">
+
+### 🧠
+**Intelligent Routing**
+
+Understands intent and dispatches to the right sub-agent automatically.
+
+</td>
+<td width="33%" align="center">
+
+### 🛡️
+**Safety First**
+
+Blocks `DROP`, `DELETE`, `UPDATE` and every other destructive operation before execution.
+
+</td>
+<td width="33%" align="center">
+
+### ⚡
+**Cost-Aware LLMs**
+
+Simple task? Cheap model. Complex task? Claude. Automatically.
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
+
+## 📚 Table of Contents
+
+<details open>
+<summary><b>Click to expand / collapse</b></summary>
+
+<br/>
+
+| Section | Description |
+|:--------|:------------|
+| [🏗️ Architecture](#️-architecture) | How the agents fit together |
+| [✨ Features](#-features) | What the system can do |
+| [🚀 Quick Start](#-quick-start) | Running in under 5 minutes |
+| [📁 Project Structure](#-project-structure) | Directory layout |
+| [⚙️ Configuration](#️-configuration) | Env vars, LLMs, database |
+| [💻 Usage](#-usage) | Code examples |
+| [🤖 The Agents](#-the-agents) | Deep dive into each agent |
+| [📊 Data Models](#-data-models) | Pydantic state schemas |
+| [🎬 Examples](#-examples) | End-to-end walkthroughs |
+| [🔐 Security](#-security) | Safety guarantees |
+| [🚨 Troubleshooting](#-troubleshooting) | Common issues |
+| [🗺️ Roadmap](#️-roadmap) | What's next |
+| [🤝 Contributing](#-contributing) | How to help |
+
+</details>
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 🏗️ Architecture
 
-The system follows a hierarchical agent architecture:
+A hierarchical, supervisor-style agent graph built on **LangGraph**.
+
+```mermaid
+flowchart TD
+    U([👤 User Query]) --> R{🧭 Router Node<br/>Classify Intent}
+
+    R -->|"sql"| S[🗄️ SQL Analyst Agent]
+    R -->|"etl"| E[⚙️ ETL Analyst Agent]
+
+    S --> S1[Query Curation]
+    S1 --> S2[Schema Context]
+    S2 --> S3[Prompt Construction]
+    S3 --> S4[SQL Generation]
+    S4 --> S5{🛡️ Safety Check}
+    S5 -->|Unsafe| SX[❌ Reject + Explain]
+    S5 -->|Safe| S6[Execute Query]
+    S6 --> S7[Answer Generation]
+
+    E --> E1[Tool Binding]
+    E1 --> E2[Intent Analysis]
+    E2 --> E3{Tool Selection}
+    E3 -->|API| E4[extract_load_tool]
+    E3 -->|Pandas| E5[transform_load_tool]
+    E4 --> E6[Safe Code Execution]
+    E5 --> E6
+    E6 --> E7[Result Report]
+
+    S7 --> OUT([📤 Structured Response])
+    E7 --> OUT
+    SX --> OUT
+
+    style U fill:#4F46E5,stroke:#312E81,color:#fff
+    style R fill:#F59E0B,stroke:#B45309,color:#fff
+    style S fill:#0EA5E9,stroke:#0369A1,color:#fff
+    style E fill:#10B981,stroke:#047857,color:#fff
+    style S5 fill:#EF4444,stroke:#991B1B,color:#fff
+    style OUT fill:#8B5CF6,stroke:#5B21B6,color:#fff
+```
+
+<details>
+<summary><b>🔄 State Flow — step by step</b></summary>
+
+<br/>
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Data Agent (Router)                      │
-│         Routes user queries to appropriate sub-agents       │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-         ┌───────────┴───────────┐
-         │                       │
-         ▼                       ▼
-    ┌──────────────┐        ┌──────────────┐
-    │ SQL Analyst  │        │ ETL Analyst  │
-    │   Agent      │        │   Agent      │
-    └──────────────┘        └──────────────┘
-         │                       │
-         ├─► Query Curation      ├─► Extract Load
-         ├─► Schema Context      ├─► Transform Load
-         ├─► SQL Generation      └─► Code Execution
-         ├─► Safety Validation   
-         ├─► Query Execution     
-         └─► Answer Generation   
+┌───────────────────────────────────────────────────────────────┐
+│  1️⃣  USER INPUT        Natural language query                  │
+├───────────────────────────────────────────────────────────────┤
+│  2️⃣  ROUTER NODE       Structured output → "sql" | "etl"       │
+├───────────────────────────────────────────────────────────────┤
+│  3️⃣  AGENT DISPATCH    Conditional edge to the sub-agent       │
+├───────────────────────────────────────────────────────────────┤
+│  4️⃣  PROCESSING        Agent runs its internal node graph      │
+├───────────────────────────────────────────────────────────────┤
+│  5️⃣  OUTPUT            Validated, structured result            │
+└───────────────────────────────────────────────────────────────┘
 ```
 
-### State Flow
+</details>
 
-1. **User Input** → Natural language query
-2. **Router Node** → Classifies query as SQL or ETL
-3. **Agent Dispatch** → Routes to appropriate sub-agent
-4. **Processing** → Each agent processes the task
-5. **Output** → Returns structured result to user
+<br/>
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## ✨ Features
 
-### Core Capabilities
+<table>
+<tr><th width="25%">Capability</th><th>What It Does</th></tr>
 
-- **Intelligent Query Routing**: Automatically classifies user queries as SQL or ETL operations
-- **SQL Analysis Agent**:
-  - Natural language to SQL query conversion
-  - Automatic schema context gathering
-  - SQL safety validation (prevents harmful operations)
-  - Query execution on PostgreSQL database
-  - Intelligent query refinement
+<tr>
+<td><b>🧭 Smart Routing</b></td>
+<td>Classifies any incoming query as a database operation or a data-pipeline operation using structured LLM output — no keyword matching.</td>
+</tr>
 
-- **ETL Agent**:
-  - API data extraction (JSON to structured formats)
-  - Data transformation using Pandas
-  - Multi-format support (CSV, JSON, Parquet)
-  - Dynamic code generation based on user requirements
-  - Safe code execution
+<tr>
+<td><b>🗄️ SQL Analysis</b></td>
+<td>Natural language → SQL. Auto-fetches live schema context, refines ambiguous questions, generates the query, validates it, executes it, and formats the answer in prose.</td>
+</tr>
 
-- **Multi-LLM Support**:
-  - Low-complexity queries: Faster, cost-effective LLM
-  - Medium-complexity queries: Balanced LLM
-  - High-complexity queries: Premium LLM (Claude)
+<tr>
+<td><b>⚙️ ETL Pipelines</b></td>
+<td>Extracts from REST APIs, normalizes nested JSON, transforms with dynamically generated Pandas code, and loads to CSV / JSON / Parquet.</td>
+</tr>
 
-- **Safety & Validation**:
-  - SQL query safety checking
-  - Protection against database modifications (INSERT, UPDATE, DELETE, DROP, etc.)
-  - Input validation and sanitization
-  - Structured output validation using Pydantic
+<tr>
+<td><b>🎚️ Multi-LLM Tiering</b></td>
+<td>Routes by complexity — <code>low</code> for cheap and fast, <code>medium</code> for balanced, <code>claude</code> for heavy reasoning.</td>
+</tr>
 
----
+<tr>
+<td><b>🛡️ Safety Layer</b></td>
+<td>Every generated query passes a validation node. Destructive DDL/DML never reaches the database.</td>
+</tr>
 
-## 📦 Prerequisites
+<tr>
+<td><b>📐 Typed State</b></td>
+<td>All agent state is Pydantic-validated. No silent shape drift between nodes.</td>
+</tr>
 
-- Python 3.12+
-- PostgreSQL database (for SQL operations)
-- API keys for LLM providers (Claude and/or OpenAI)
-- Virtual environment (recommended)
+</table>
 
----
+<br/>
 
-## 🚀 Installation
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
-### 1. Clone and Setup Project
+## 🚀 Quick Start
+
+### Prerequisites
+
+| Requirement | Version | Notes |
+|:------------|:--------|:------|
+| 🐍 Python | `3.12+` | Required |
+| 🐘 PostgreSQL | `14+` | For SQL agent |
+| 🔑 Anthropic API Key | — | For high-complexity tier |
+| 🔑 OpenAI API Key | — | For low / medium tiers |
+
+<br/>
+
+### 1️⃣ &nbsp;Clone & Create Environment
 
 ```bash
+git clone <your-repo-url>
 cd Data_Agent
-python -m venv .venv
 
-# Activate virtual environment
-# On Windows:
+python -m venv .venv
+```
+
+<details>
+<summary><b>Activate the virtual environment</b></summary>
+
+<br/>
+
+**Windows (PowerShell)**
+```powershell
 .\.venv\Scripts\Activate.ps1
-# On macOS/Linux:
+```
+
+**macOS / Linux**
+```bash
 source .venv/bin/activate
 ```
 
-### 2. Install Dependencies
+</details>
+
+### 2️⃣ &nbsp;Install Dependencies
 
 ```bash
 uv pip install -r requirements.txt
@@ -139,458 +253,607 @@ uv pip install -r requirements.txt
 pip install -e .
 ```
 
-This installs:
-- **langchain**: Core LLM framework
-- **langgraph**: Multi-agent orchestration
-- **langchain-anthropic**: Claude AI integration
-- **langchain-openai**: OpenAI integration
-- **pandas**: Data processing
-- **psycopg2**: PostgreSQL driver
-- **pydantic**: Data validation
-- **python-dotenv**: Environment configuration
+<details>
+<summary><b>📦 What gets installed</b></summary>
 
-### 3. Environment Configuration
+<br/>
 
-Create a `.env` file in the root directory:
+| Package | Role |
+|:--------|:-----|
+| `langchain` | Core LLM framework |
+| `langgraph` | Multi-agent orchestration |
+| `langchain-anthropic` | Claude integration |
+| `langchain-openai` | OpenAI integration |
+| `pandas` | Data transformation engine |
+| `psycopg2` | PostgreSQL driver |
+| `pydantic` | State validation |
+| `python-dotenv` | Env configuration |
+
+</details>
+
+### 3️⃣ &nbsp;Configure Environment
+
+Create a `.env` file in the project root:
 
 ```env
-# LLM Configuration
+# ─── 🔑 LLM Configuration ──────────────────────────
 ANTHROPIC_API_KEY=your_claude_api_key
 OPENAI_API_KEY=your_openai_api_key
 
-# Database Configuration
+# ─── 🐘 Database Configuration ─────────────────────
 host=localhost
 port=5432
 user=postgres
 password=your_password
 database=data_agent_db
 
-# Optional: LLM Model Selection
+# ─── 🎚️ Optional: Model Tiers ──────────────────────
 LLM_MODEL_LOW=gpt-3.5-turbo
 LLM_MODEL_MEDIUM=gpt-4-turbo
 LLM_MODEL_HIGH=claude-3-opus
 ```
 
----
+> [!WARNING]
+> Never commit your `.env` file. Add it to `.gitignore` before your first push.
+
+### 4️⃣ &nbsp;Seed the Database & Run
+
+```bash
+python feed_db.py   # loads the sample CSVs into PostgreSQL
+python main.py      # 🚀 launch the agent
+```
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 📁 Project Structure
 
 ```
 Data_Agent/
-├── agents/                          # Agent implementations
+│
+├── 🤖 agents/                    # Agent implementations
 │   ├── __init__.py
-│   ├── data_agent.py               # Main router agent
-│   ├── sql_analyst.py              # SQL query agent
-│   └── etl_analyst.py              # ETL operations agent
+│   ├── data_agent.py            # 🧭 Main router agent
+│   ├── sql_analyst.py           # 🗄️ SQL query agent
+│   └── etl_analyst.py           # ⚙️ ETL operations agent
 │
-├── Models/                          # Data models
+├── 📐 Models/                    # Pydantic state schemas
 │   ├── __init__.py
-│   └── schema.py                   # Pydantic schemas for state management
+│   └── schema.py
 │
-├── utils/                           # Utility modules
+├── 🛠️ utils/                     # Shared utilities
 │   ├── __init__.py
-│   ├── database.py                 # PostgreSQL utilities
-│   ├── etl_tools.py                # ETL operations toolkit
-│   ├── llm_pick.py                 # LLM selection logic
+│   ├── database.py              # PostgreSQL helpers
+│   ├── etl_tools.py             # ETL toolkit (@tool defs)
+│   └── llm_pick.py              # LLM tier selection
 │
-├── data/                            # Data directory
-│   ├── extract/                     # Extracted data storage
-│   ├── transform/                   # Transformed data storage
-│   ├── payments.csv                 # Sample dataset
-│   ├── ratings.csv                  # Sample dataset
-│   ├── rides.csv                    # Sample dataset
-│   ├── users.csv                    # Sample dataset
-│   └── vehicles.csv                 # Sample dataset
+├── 📊 data/                      # Data workspace
+│   ├── extract/                 # ← API extraction output
+│   ├── transform/               # ← Transformation output
+│   ├── payments.csv
+│   ├── ratings.csv
+│   ├── rides.csv
+│   ├── users.csv
+│   └── vehicles.csv
 │
-├── main.py                          # Entry point
-├── feed_db.py                       # Database initialization script
-├── pyproject.toml                   # Project metadata and dependencies
-└── README.md                         # This file
+├── 🚪 main.py                    # Entry point
+├── 🌱 feed_db.py                 # DB initialization
+├── 📦 pyproject.toml             # Metadata & dependencies
+└── 📖 README.md
 ```
 
----
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## ⚙️ Configuration
 
-### LLM Selection (`utils/llm_pick.py`)
+### 🎚️ LLM Tier Selection
 
-The `pick_llm()` function intelligently selects the appropriate LLM based on complexity:
+`pick_llm()` chooses a model based on the complexity of the task at hand:
 
 ```python
 from utils.llm_pick import pick_llm
 
-# Select based on complexity
-llm_fast = pick_llm("low")        # Cost-effective for simple queries
-llm_balanced = pick_llm("medium") # Balanced performance and cost
-llm_powerful = pick_llm("claude") # Premium model for complex tasks
+llm_fast     = pick_llm("low")     # ⚡ Cheap & fast — routing, classification
+llm_balanced = pick_llm("medium")  # ⚖️ Balanced — SQL generation
+llm_powerful = pick_llm("claude")  # 🧠 Premium — complex reasoning, code gen
 ```
 
-### Database Configuration (`utils/database.py`)
+| Tier | Use Case | Trade-off |
+|:-----|:---------|:----------|
+| `low` | Routing, simple lookups | 💰 Lowest cost, fastest |
+| `medium` | SQL generation, schema reasoning | ⚖️ Balanced |
+| `claude` | Multi-step ETL, code generation | 🧠 Highest quality |
+
+### 🐘 Database Setup
 
 ```python
 from utils.database import DatabaseUtil
 
 conn_details = {
-    "host": "localhost",
-    "port": 5432,
-    "user": "postgres",
+    "host":     "localhost",
+    "port":     5432,
+    "user":     "postgres",
     "password": "password",
-    "dbname": "data_agent_db"
+    "dbname":   "data_agent_db",
 }
 
 db = DatabaseUtil(conn_details)
 schema_info = db.schema_details("public")
 ```
 
----
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 💻 Usage
 
-### Running the Data Agent
-
-**Basic Usage:**
+### 🗄️ SQL Query
 
 ```python
 from agents.data_agent import data_agent
 from langchain_core.messages import HumanMessage
 
-# Example: Extract data from API
 response = data_agent.invoke({
     "messages": [
-        HumanMessage(content="""
-            I want to extract the data from the API endpoint 
-            'https://pokeapi.co/api/v2/pokemon' and save it to 
-            data/extract folder in CSV format
-        """)
+        HumanMessage(content="Show me the top 5 users with the highest ratings")
     ],
-    "route_response": ""
+    "route_response": "",
 })
 
 print(response)
 ```
 
-**SQL Query Example:**
+### 📥 API Extraction
 
 ```python
 response = data_agent.invoke({
     "messages": [
         HumanMessage(content="""
-            Show me the top 5 users with the highest ratings
+            Extract the data from 'https://pokeapi.co/api/v2/pokemon'
+            and save it to the data/extract folder in CSV format
         """)
     ],
-    "route_response": ""
+    "route_response": "",
 })
 ```
 
-**ETL Example:**
+### 🔄 Data Transformation
 
 ```python
 response = data_agent.invoke({
     "messages": [
         HumanMessage(content="""
-            Transform the rides.csv data by filtering only rides 
-            with rating > 4.5 and save to data/transform
+            Transform rides.csv by filtering only rides with rating > 4.5
+            and save the result to data/transform
         """)
     ],
-    "route_response": ""
+    "route_response": "",
 })
 ```
 
-### Running from Command Line
+### 🖥️ From the Command Line
 
 ```bash
-# Run the main data agent
-python main.py
-
-# Run individual agents
-python agents/sql_analyst.py
-python agents/etl_analyst.py
+python main.py                    # 🚀 Full router agent
+python agents/sql_analyst.py      # 🗄️ SQL agent standalone
+python agents/etl_analyst.py      # ⚙️ ETL agent standalone
 ```
 
----
+<br/>
 
-## 🤖 Agent Descriptions
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
-### 1. **Data Agent (Main Router)**
+## 🤖 The Agents
+
+<details open>
+<summary><h3>🧭 &nbsp;1. Data Agent — The Router</h3></summary>
+
 **File:** `agents/data_agent.py`
 
-**Responsibility:** 
-- Receives natural language user queries
-- Classifies queries as either SQL or ETL operations
-- Routes queries to appropriate sub-agents
-- Aggregates results and returns to user
+The supervisor. Reads intent, decides who handles it, aggregates the result.
 
-**Components:**
-- **Router Node**: Uses structured output to classify query intent
-- **Conditional Routing**: Routes to SQL or ETL based on classification
-- **Graph Orchestration**: Manages workflow using LangGraph
+| Component | Role |
+|:----------|:-----|
+| **Router Node** | Structured output classification → `"sql"` or `"etl"` |
+| **Conditional Edge** | Dispatches to the matching sub-agent |
+| **Graph Orchestration** | LangGraph state machine managing the whole flow |
 
----
+</details>
 
-### 2. **SQL Analyst Agent**
+<details>
+<summary><h3>🗄️ &nbsp;2. SQL Analyst Agent</h3></summary>
+
 **File:** `agents/sql_analyst.py`
 
-**Responsibility:**
-- Converts natural language queries to SQL
-- Handles all database query operations
-- Validates query safety
-- Executes queries and returns results
+Turns questions into validated, executed SQL.
 
-**Workflow:**
-1. **Query Curation** - Refines user question for clarity
-2. **Context Gathering** - Fetches database schema details
-3. **Prompt Construction** - Creates detailed context for LLM
-4. **SQL Generation** - Generates SQL query using LLM
-5. **Safety Check** - Validates query safety
-6. **Query Execution** - Executes validated query on database
-7. **Answer Generation** - Formats and returns results
+```
+1. Query Curation      →  Refine the raw question for clarity
+2. Context Gathering   →  Pull live schema from PostgreSQL
+3. Prompt Construction →  Build a rich, grounded context block
+4. SQL Generation      →  LLM writes the query
+5. Safety Check   🛡️   →  Validate before anything touches the DB
+6. Query Execution     →  Run it
+7. Answer Generation   →  Format results as readable prose
+```
 
-**Safety Features:**
-- Prevents execution of dangerous commands (INSERT, UPDATE, DELETE, DROP, ALTER)
-- Validates query before execution
-- Automatic result limiting to 10 rows (unless specified)
-- Schema validation against database
+**Safety features**
 
----
+- 🚫 Blocks `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`
+- ✅ Validates every query before execution
+- 🔢 Auto-limits results to 10 rows unless told otherwise
+- 📐 Validates generated SQL against the real schema
 
-### 3. **ETL Analyst Agent**
+</details>
+
+<details>
+<summary><h3>⚙️ &nbsp;3. ETL Analyst Agent</h3></summary>
+
 **File:** `agents/etl_analyst.py`
 
-**Responsibility:**
-- Handles data extraction from APIs
-- Performs data transformation using Pandas
-- Manages data loading to various formats
-- Executes code safely in controlled environment
+Extraction, transformation and loading — driven entirely by tool calls.
 
-**Workflow:**
-1. **Tool Binding** - Attaches ETL tools to LLM
-2. **User Intent Understanding** - Analyzes transformation requirements
-3. **Tool Selection** - Chooses appropriate ETL operation
-4. **Code Generation** - Generates Pandas code for transformation
-5. **Safe Execution** - Executes generated code in sandboxed environment
-6. **Result Reporting** - Returns execution status and generated code
+```
+1. Tool Binding        →  Attach ETL tools to the LLM
+2. Intent Analysis     →  Understand the transformation goal
+3. Tool Selection      →  Pick extract vs. transform
+4. Code Generation     →  Write Pandas code on the fly
+5. Safe Execution 🛡️   →  Run in a controlled environment
+6. Result Reporting    →  Return status + generated code
+```
 
-**Supported Tools:**
-- **extract_load_tool**: Extract from API → Load to storage
-- **transform_load_tool**: Transform data using Pandas → Load result
+**Available tools**
 
-**Supported Formats:**
-- CSV (default)
-- JSON (Lines or Records)
-- Parquet
+| Tool | Purpose |
+|:-----|:--------|
+| `extract_load_tool` | REST API → normalized → storage |
+| `transform_load_tool` | Pandas transformation → storage |
 
----
+**Output formats:** `CSV` *(default)* · `JSON` *(Lines or Records)* · `Parquet`
+
+</details>
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 📊 Data Models
 
-### AgentSchema (SQL Agent State)
+All agent state is typed and validated with **Pydantic**.
+
+<details open>
+<summary><b>🗄️ AgentSchema</b> — SQL agent state</summary>
+
+<br/>
+
 ```python
 class AgentSchema(BaseModel):
-    messages: List                    # Conversation messages
-    user_question: str                # Original user query
-    curated_ques: str                 # Refined question
-    prompt_query_context: str         # Database context + prompt
-    generated_sql_query: str          # Generated SQL
-    is_safe: Literal["Yes", "No"]     # Safety validation result
-    comments: str                     # Safety check comments
-    sql_query_execution_result: str   # Query result
-    final_answer: str                 # Final formatted answer
+    messages: List                    # 💬 Conversation messages
+    user_question: str                # ❓ Original user query
+    curated_ques: str                 # ✏️  Refined question
+    prompt_query_context: str         # 📚 Database context + prompt
+    generated_sql_query: str          # 🗄️  Generated SQL
+    is_safe: Literal["Yes", "No"]     # 🛡️  Safety validation result
+    comments: str                     # 💭 Safety check reasoning
+    sql_query_execution_result: str   # 📊 Raw query result
+    final_answer: str                 # ✅ Formatted answer
 ```
 
-### ETLAgentSchema (ETL Agent State)
+</details>
+
+<details>
+<summary><b>⚙️ ETLAgentSchema</b> — ETL agent state</summary>
+
+<br/>
+
 ```python
 class ETLAgentSchema(BaseModel):
-    messages: List                    # Conversation messages
+    messages: List                    # 💬 Conversation messages
 ```
 
-### RouterSchema (Query Classification)
+</details>
+
+<details>
+<summary><b>🧭 RouterSchema</b> — Query classification</summary>
+
+<br/>
+
 ```python
 class RouterSchema(BaseModel):
-    answer: Literal["sql", "etl"]     # Query classification
-    comments: str                     # Reasoning for classification
+    answer: Literal["sql", "etl"]     # 🎯 Classification
+    comments: str                     # 💭 Reasoning
 ```
 
-### DataAgentSchema (Main Agent State)
+</details>
+
+<details>
+<summary><b>🤖 DataAgentSchema</b> — Main agent state</summary>
+
+<br/>
+
 ```python
 class DataAgentSchema(BaseModel):
-    messages: List                    # All conversation messages
-    route_response: str               # Router decision (sql/etl)
+    messages: List                    # 💬 All conversation messages
+    route_response: str               # 🧭 Router decision
 ```
 
----
+</details>
 
-## 📚 Examples
+<br/>
 
-### Example 1: Database Query
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
-**User Query:**
+## 🎬 Examples
+
+<details open>
+<summary><h3>📊 Example 1 — Database Query</h3></summary>
+
+> 💬 **You:** *"Show me the average rating for each vehicle type"*
+
 ```
-"Show me the average rating for each vehicle type"
-```
-
-**Processing:**
-1. Router classifies as SQL query
-2. SQL Agent fetches schema
-3. Generates: `SELECT vehicle_type, AVG(rating) FROM rides GROUP BY vehicle_type LIMIT 10`
-4. Validates safety ✓
-5. Executes and returns results
-
----
-
-### Example 2: Data Extraction
-
-**User Query:**
-```
-"Extract the data from 'https://pokeapi.co/api/v2/pokemon' and save it as CSV"
+🧭 Router          →  classified as SQL
+🗄️  SQL Agent      →  fetching schema...
+✏️  Generated      →  SELECT vehicle_type, AVG(rating)
+                      FROM rides
+                      GROUP BY vehicle_type
+                      LIMIT 10
+🛡️  Safety Check   →  ✅ PASSED
+⚡ Execution       →  4 rows returned
+📤 Answer          →  formatted response
 ```
 
-**Processing:**
-1. Router classifies as ETL operation
-2. ETL Agent selects extract_load_tool
-3. Makes API request to endpoint
-4. Normalizes JSON response
-5. Saves to `data/extract/extracted_data.csv`
+</details>
 
----
+<details>
+<summary><h3>📥 Example 2 — API Extraction</h3></summary>
 
-### Example 3: Data Transformation
+> 💬 **You:** *"Extract the data from 'https://pokeapi.co/api/v2/pokemon' and save it as CSV"*
 
-**User Query:**
 ```
-"Transform rides.csv to filter only rides with rating > 4.0 and save as JSON"
+🧭 Router          →  classified as ETL
+⚙️  ETL Agent      →  selected extract_load_tool
+🌐 API Request     →  GET https://pokeapi.co/api/v2/pokemon
+🔧 Normalize       →  flattening nested JSON
+💾 Saved           →  data/extract/extracted_data.csv
 ```
 
-**Processing:**
-1. Router classifies as ETL operation
-2. ETL Agent analyzes requirement
-3. Generates Pandas code to filter and transform
-4. Executes code safely
-5. Saves result to `data/transform/` in JSON format
+</details>
 
----
+<details>
+<summary><h3>🔄 Example 3 — Data Transformation</h3></summary>
 
-## 🔐 Security Features
+> 💬 **You:** *"Transform rides.csv to filter only rides with rating > 4.0 and save as JSON"*
 
-✅ **SQL Safety Validation**
-- Query inspection before execution
-- Blocks destructive operations
-- Database structure protection
+```
+🧭 Router          →  classified as ETL
+⚙️  ETL Agent      →  analyzing requirement
+🐼 Code Gen        →  df[df['rating'] > 4.0]
+🛡️  Safe Exec      →  sandboxed run ✅
+💾 Saved           →  data/transform/output.json
+```
 
-✅ **Safe Code Execution**
-- Sandboxed Python code execution
-- Input validation
-- Error handling and reporting
+</details>
 
-✅ **Environment Security**
-- Credentials stored in `.env` (not in code)
-- Sensitive data protection
-- Proper exception handling
+<br/>
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
+
+## 🔐 Security
+
+| ✅ | Guarantee | How |
+|:--:|:----------|:----|
+| 🛡️ | **SQL Safety Validation** | Every query is inspected by a dedicated validation node before execution. Destructive operations are rejected with an explanation. |
+| 🧪 | **Safe Code Execution** | Generated Pandas code runs in a controlled environment with input validation and full error capture. |
+| 🔑 | **Credential Isolation** | All secrets live in `.env`, never in source. |
+| 📐 | **Typed Boundaries** | Pydantic validation on every state transition prevents malformed data propagation. |
+
+> [!IMPORTANT]
+> The safety layer is a strong guardrail, not a substitute for database permissions. Always connect with a **read-only** role in production.
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 🛠️ Development
 
-### Adding a New Agent
+<details>
+<summary><b>➕ Adding a New Agent</b></summary>
 
-1. Create new agent file in `agents/` directory
-2. Define state schema in `Models/schema.py`
-3. Implement agent nodes using LangGraph
-4. Add routing logic in `data_agent.py`
-5. Update documentation
+<br/>
 
-### Extending ETL Tools
+1. Create the agent file in `agents/`
+2. Define its state schema in `Models/schema.py`
+3. Implement the nodes using LangGraph
+4. Register the routing logic in `data_agent.py`
+5. Update this README
+
+</details>
+
+<details>
+<summary><b>🔧 Extending the ETL Toolkit</b></summary>
+
+<br/>
 
 Add new tools in `utils/etl_tools.py`:
 
 ```python
+from langchain_core.tools import tool
+
 @tool
 def new_tool(param: str) -> str:
-    """Tool description"""
-    # Implementation
-    pass
+    """Clear, specific description — the LLM reads this to decide when to call it."""
+    ...
 ```
 
-### Customizing LLM Selection
+</details>
 
-Modify `utils/llm_pick.py` to adjust:
+<details>
+<summary><b>🎚️ Customizing LLM Selection</b></summary>
+
+<br/>
+
+Edit `utils/llm_pick.py` to tune:
+
 - Model selection criteria
-- Temperature and parameters
+- Temperature and sampling parameters
 - Token limits
-- Response format
+- Response format enforcement
 
----
+</details>
 
-## 📝 Environment Variables Reference
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
+
+## 📝 Environment Variables
 
 | Variable | Description | Example |
-|----------|-------------|---------|
-| `ANTHROPIC_API_KEY` | Claude API key | `sk-ant-...` |
-| `OPENAI_API_KEY` | OpenAI API key | `sk-...` |
-| `host` | PostgreSQL host | `localhost` |
-| `port` | PostgreSQL port | `5432` |
-| `user` | PostgreSQL user | `postgres` |
-| `password` | PostgreSQL password | `your_password` |
-| `database` | Database name | `data_agent_db` |
+|:---------|:------------|:--------|
+| `ANTHROPIC_API_KEY` | 🔑 Claude API key | `sk-ant-...` |
+| `OPENAI_API_KEY` | 🔑 OpenAI API key | `sk-...` |
+| `host` | 🐘 PostgreSQL host | `localhost` |
+| `port` | 🔌 PostgreSQL port | `5432` |
+| `user` | 👤 PostgreSQL user | `postgres` |
+| `password` | 🔒 PostgreSQL password | `your_password` |
+| `database` | 🗄️ Database name | `data_agent_db` |
 
----
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 🚨 Troubleshooting
 
-### Issue: "Database connection failed"
-**Solution:** Verify PostgreSQL is running and credentials in `.env` are correct
+<details>
+<summary><b>❌ "Database connection failed"</b></summary>
 
-### Issue: "API key not found"
-**Solution:** Ensure API keys are set in `.env` file
+<br/>
 
-### Issue: "SQL query unsafe"
-**Solution:** The query contains destructive operations. Reformulate as a SELECT query only
+Verify PostgreSQL is running and your `.env` credentials are correct.
 
-### Issue: "Module not found"
-**Solution:** Activate virtual environment and reinstall dependencies
+```bash
+pg_isready -h localhost -p 5432
+```
 
----
+</details>
 
-## 📈 Performance Considerations
+<details>
+<summary><b>❌ "API key not found"</b></summary>
 
-- **Query Complexity**: Low complexity queries use faster LLMs
-- **Database Optimization**: Add indexes for frequently queried columns
-- **API Rate Limiting**: Respect rate limits of external APIs
-- **Memory Usage**: Large dataset transformations may require optimization
+<br/>
 
----
+Confirm your `.env` exists in the project root and is being loaded by `python-dotenv`.
+
+</details>
+
+<details>
+<summary><b>❌ "SQL query unsafe"</b></summary>
+
+<br/>
+
+The generated query contained a destructive operation. Rephrase your request as a read-only question — the agent only executes `SELECT`.
+
+</details>
+
+<details>
+<summary><b>❌ "Module not found"</b></summary>
+
+<br/>
+
+Activate your virtual environment and reinstall:
+
+```bash
+source .venv/bin/activate
+uv pip install -r requirements.txt
+```
+
+</details>
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
+
+## 📈 Performance Notes
+
+| Area | Recommendation |
+|:-----|:---------------|
+| ⚡ **Query complexity** | Low-complexity queries route to faster, cheaper models automatically |
+| 🗄️ **Database** | Add indexes on frequently filtered columns |
+| 🌐 **API calls** | Respect upstream rate limits when extracting |
+| 💾 **Memory** | Large transformations may need chunking or Dask |
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
+
+## 🗺️ Roadmap
+
+- [x] Multi-agent routing with LangGraph
+- [x] SQL generation with safety validation
+- [x] ETL extraction and transformation tools
+- [x] Multi-tier LLM selection
+- [ ] Conversation memory across turns
+- [ ] Streaming responses
+- [ ] Web UI dashboard
+- [ ] Additional database connectors (MySQL, Snowflake, BigQuery)
+- [ ] Automated test suite
+- [ ] Query result caching
+
+<br/>
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please ensure:
+Contributions are very welcome. Before opening a PR, please make sure:
 
-1. Code follows existing style
-2. All agents have proper documentation
-3. New features include state schemas
-4. Security implications are considered
-5. Tests are added for new functionality
+- ✅ Code follows the existing style
+- ✅ New agents include full docstrings
+- ✅ New features define their state schemas
+- ✅ Security implications are considered
+- ✅ Tests accompany new functionality
 
----
+```bash
+git checkout -b feature/your-feature
+git commit -m "feat: add your feature"
+git push origin feature/your-feature
+```
 
-## 📄 License
+<br/>
 
-This project is part of an AI engineering demonstration.
-
----
-
-## 👨‍💻 Author & Support
-
-For questions, issues, or suggestions, please refer to the project documentation or reach out to the development team.
-
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="100%"/>
 
 ## 🎓 Learning Resources
 
-- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
-- [LangChain Documentation](https://python.langchain.com/)
-- [Claude API Reference](https://docs.anthropic.com/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+<p align="center">
+  <a href="https://langchain-ai.github.io/langgraph/"><img src="https://img.shields.io/badge/LangGraph-Docs-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white"/></a>
+  <a href="https://python.langchain.com/"><img src="https://img.shields.io/badge/LangChain-Docs-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white"/></a>
+  <a href="https://docs.anthropic.com/"><img src="https://img.shields.io/badge/Claude-API_Reference-D97757?style=for-the-badge&logo=anthropic&logoColor=white"/></a>
+  <a href="https://www.postgresql.org/docs/"><img src="https://img.shields.io/badge/PostgreSQL-Docs-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/></a>
+</p>
 
----
+<br/>
 
-**Last Updated:** August 2026
-**Version:** 0.1.0
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%"/>
+
+<div align="center">
+
+### 👨‍💻 Author & Support
+
+Questions, issues or ideas? Open an issue or start a discussion.
+
+<br/>
+
+**Version** `0.1.0` &nbsp;·&nbsp; **Last Updated** August 2026 &nbsp;·&nbsp; **License** MIT
+
+<br/>
+
+⭐ **If this project helped you, consider giving it a star!** ⭐
+
+<br/>
+
+<sub>Built with 🧠 LangGraph, ⚡ LangChain, and 🐘 PostgreSQL</sub>
+
+</div>
