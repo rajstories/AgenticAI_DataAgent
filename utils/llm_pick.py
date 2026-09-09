@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-MODEL_MAP = {
-    "low": ChatOpenAI(model_name="gpt-5.6-luna", temperature=0, model_kwargs={"reasoning_effort": "none"}),
-    "medium": ChatOpenAI(model_name="gpt-5.6-terra", temperature=0, model_kwargs={"reasoning_effort": "none"}),
-    "high": ChatOpenAI(model_name="gpt-5.6-sol", temperature=0, model_kwargs={"reasoning_effort": "none"}),
-    "claude": ChatAnthropic(model_name="claude-sonnet-5"),
+MODEL_FACTORIES = {
+    "low": lambda: ChatOpenAI(model_name="gpt-5.6-luna", temperature=0, model_kwargs={"reasoning_effort": "none"}),
+    "medium": lambda: ChatOpenAI(model_name="gpt-5.6-terra", temperature=0, model_kwargs={"reasoning_effort": "none"}),
+    "high": lambda: ChatOpenAI(model_name="gpt-5.6-sol", temperature=0, model_kwargs={"reasoning_effort": "none"}),
+    "claude": lambda: ChatAnthropic(model_name="claude-sonnet-5"),
 }
 
 def pick_llm(level: str):
@@ -24,10 +24,10 @@ def pick_llm(level: str):
     """
     key = level.lower()
 
-    if key not in MODEL_MAP:
+    if key not in MODEL_FACTORIES:
         raise ValueError(f"Unsupported level: {level}")
 
-    return MODEL_MAP[key]
+    return MODEL_FACTORIES[key]()
 
 if __name__ == "__main__":
     llm_obj = pick_llm("low")  
