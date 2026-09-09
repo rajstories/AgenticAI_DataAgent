@@ -12,6 +12,20 @@ from langgraph.graph import StateGraph, START, END
 
 # -------------------------------------- AI Agent Code--------------------------------------
 
+
+def build_db_config():
+    return {
+        "host": os.environ['host'],
+        "port": os.environ['port'],
+        "user": os.environ['user'],
+        "password": os.environ['password'],
+        "dbname": os.environ['database']
+    }
+
+
+def build_database_util():
+    return DatabaseUtil(build_db_config())
+
 def curate_ques(state: AgentSchema) -> AgentSchema: 
 
     user_question = state.user_question # Bcz this is a Pydantic model object
@@ -30,15 +44,7 @@ def prompt_query_context(state: AgentSchema) -> AgentSchema:
 
     curated_question = state.curated_ques
 
-    conn_details = {
-        "host": os.environ['host'],
-        "port": os.environ['port'],
-        "user": os.environ['user'],
-        "password": os.environ['password'],
-        "dbname": os.environ['database']
-    }
-
-    obj = DatabaseUtil(conn_details)
+    obj = build_database_util()
 
     schema_info = obj.schema_details("public")  # Fetch schema details for the 'public' schema
 
@@ -121,15 +127,7 @@ def execute_sql(state: AgentSchema) -> AgentSchema:
 
     sql_query = state.generated_sql_query
 
-    conn_details = {
-        "host": os.environ['host'],
-        "port": os.environ['port'],
-        "user": os.environ['user'],
-        "password": os.environ['password'],
-        "dbname": os.environ['database']
-    }
-
-    obj = DatabaseUtil(conn_details)
+    obj = build_database_util()
 
     execution_result = obj.execute_sql(sql_query)  # Execute the SQL query on the database
 
