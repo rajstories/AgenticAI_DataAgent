@@ -1,11 +1,10 @@
 from pydantic import BaseModel, Field
-from typing import Annotated, Literal
-from langchain_core.messages import BaseMessage
+from typing import Annotated, Any, Literal
 from operator import add
 
 
 class AgentSchema(BaseModel):
-    messages: Annotated[list[BaseMessage], add] = Field(default_factory=list, description="List of messages to be processed by the agent")
+    messages: Annotated[list[Any], add] = Field(default_factory=list, description="List of messages to be processed by the agent")
     user_question : str = Field(..., description="The original question asked by the user")
     curated_ques : str = Field(..., description="Curated user question")
     prompt_query_context : str = Field(..., description="A detailed prompt with SQL DB context that will help agent to generate SQL Query")
@@ -22,12 +21,12 @@ class JudgeSchema(BaseModel):
 
 
 class ETLAgentSchema(BaseModel):
-    messages: Annotated[list[BaseMessage], add] = Field(default_factory=list, description="List of messages to be processed by the ETL agent")
+    messages: Annotated[list[Any], add] = Field(default_factory=list, description="List of messages to be processed by the ETL agent")
 
 class RouterSchema(BaseModel):
     answer: Literal["sql","etl"] = Field(..., description="Indicates whether the user's question is related to SQL or ETL operations")
     comments: str = Field(..., description="Additional comments or feedback regarding the classification of the user's question")
 
 class DataAgentSchema(BaseModel):
-    messages: Annotated[list[BaseMessage], add] = Field(default_factory=list, description="List of messages to be processed by the Data agent")
+    messages: Annotated[list[Any], add] = Field(default_factory=list, description="List of messages to be processed by the Data agent")
     route_response : str = Field(..., description="The response from the router indicating whether to route to SQL or ETL operations")
