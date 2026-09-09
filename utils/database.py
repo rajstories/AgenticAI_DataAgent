@@ -18,6 +18,10 @@ class DatabaseUtil:
         schema_info_context = ""
         
         connection = self.connection
+
+        if connection is None:
+            return "Error fetching schema details: database connection is not available"
+
         cursor = connection.cursor()
 
         schema_info_context = f"Database Schema: {schema_name}\n"
@@ -32,7 +36,10 @@ class DatabaseUtil:
                 schema_info_context = f"{schema_info_context}\nTable: {table_name}\n"
 
                 # Adding Columns & Data Types
-                cursor.execute("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = %s;", (table_name,))
+                cursor.execute(
+                    "SELECT column_name, data_type FROM information_schema.columns WHERE table_schema = %s AND table_name = %s;",
+                    (schema_name, table_name)
+                )
                 columns_list = cursor.fetchall()
 
                 for column in columns_list:
@@ -62,10 +69,12 @@ class DatabaseUtil:
     def execute_sql(self, query):
         try:
             connection = self.connection
+            if connection is None:
+                return "No database connection available"
+
             cursor = connection.cursor()
             cursor.execute(query)
             result = cursor.fetchall()
-            connection.commit()
             return str(result)
         except Exception as e:
             print(f"Error executing query: {e}")
