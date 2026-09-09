@@ -840,20 +840,4 @@ git push origin feature/your-feature
 
 <div align="center">
 
-### 👨‍💻 Author & Support
 
-Questions, issues or ideas? Open an issue or start a discussion.
-
-<br/>
-
-**Version** `0.1.0` &nbsp;·&nbsp; **Last Updated** August 2026 &nbsp;·&nbsp; **License** MIT
-
-<br/>
-
-⭐ **If this project helped you, consider giving it a star!** ⭐
-
-<br/>
-
-<sub>Built with 🧠 LangGraph, ⚡ LangChain, and 🐘 PostgreSQL</sub>
-
-</div>
