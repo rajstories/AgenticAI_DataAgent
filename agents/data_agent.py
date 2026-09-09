@@ -3,14 +3,10 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from agents import sql_analyst
 from utils.llm_pick import pick_llm
-from utils.etl_tools import ETLTools
 from Models.schema import RouterSchema, DataAgentSchema
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from langgraph.graph import StateGraph, START, END
-from langchain.tools import tool
-from langchain_anthropic import ChatAnthropic
+from langchain_core.messages import HumanMessage
+from langgraph.graph import StateGraph, START
 from agents.etl_analyst import etl_analyst
 from agents.sql_analyst import sql_analyst
 
@@ -103,17 +99,6 @@ from IPython.display import display, Image
 img = Image(data_agent.get_graph().draw_mermaid_png())
 with open("data_agent_graph.png", "wb") as f:
     f.write(img.data)
-
-
-
-if __name__ == "__main__":
-
-    response = data_agent.invoke(
-        {"messages":[HumanMessage(content="I want to extract the data from the API endpoint 'https://pokeapi.co/api/v2/pokemon' and save it to data/extract folder in the csv folder")],
-         "route_response": ""}
-    )
-
-    print(response)
 
 
 
