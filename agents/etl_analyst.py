@@ -6,17 +6,16 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.llm_pick import pick_llm
 from utils.etl_tools import ETLTools
 from Models.schema import ETLAgentSchema
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 from langgraph.graph import StateGraph, START, END
 from langchain.tools import tool
-from langchain_anthropic import ChatAnthropic
 
 
 #------------------------------------ AGENT TOOLS ------------------------------------#
 
 
 @tool
-def extract_load_tool(url:str, output_folder:str, format:str) -> str:
+def extract_load_tool(url:str, output_folder:str, output_format:str) -> str:
     """
     This tool extracts the data from the API (url) and loads it into the
     the desired location (output_folder).
@@ -24,14 +23,14 @@ def extract_load_tool(url:str, output_folder:str, format:str) -> str:
     Args:
         url (str): The API endpoint from which to extract data.
         output_folder (str): The folder where the extracted data will be saved.
-        format (str): The format in which to save the extracted data (csv, json, parquet).
+        output_format (str): The format in which to save the extracted data (csv, json, parquet).
     
     Returns:
         str: A message indicating the success or failure of the operation.
 
     """
     etl_tools = ETLTools()
-    return etl_tools.extract_load(url, output_folder, format)
+    return etl_tools.extract_load(url, output_folder, output_format)
 
 
 @tool
