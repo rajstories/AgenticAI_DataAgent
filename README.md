@@ -223,8 +223,7 @@ flowchart TD
 
 ```bash
 git clone <your-repo-url>
-cd Data_Agent
-
+cd Agentic_AI_Project
 python -m venv .venv
 ```
 
@@ -273,7 +272,13 @@ pip install -e .
 
 ### 3️⃣ &nbsp;Configure Environment
 
-Create a `.env` file in the project root:
+Copy the example file and fill in your local values:
+
+```bash
+cp .env.example .env
+```
+
+Then update the `.env` file in the root directory:
 
 ```env
 # ─── 🔑 LLM Configuration ──────────────────────────
