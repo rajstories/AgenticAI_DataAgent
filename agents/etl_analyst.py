@@ -50,7 +50,7 @@ def transform_load_tool(input_file_path:str,output_folder:str,output_format:str,
     """
     etl_tools = ETLTools()
 
-    top_3_rows = etl_tools.transform_load_context(input_file_path)
+    top_3_rows = etl_tools.preview_input_data(input_file_path)
 
     llm = pick_llm("claude")
 

@@ -52,10 +52,10 @@ class ETLTools:
             return f"Failed to extract data: {e}"
 
 
-    def transform_load_context(self, file_path:str):
+    def preview_input_data(self, file_path:str):
         """
-        This tool transforms the data from the specified file and loads it into the
-        desired location (output_folder).
+        This helper previews the first few rows of a local data file so the ETL
+        agent can generate a context-aware transformation plan.
 
         Args:
             file_path (str): The path to the file containing the data to be transformed.
@@ -78,6 +78,9 @@ class ETLTools:
         top_3_rows = str(df.head(3))
 
         return top_3_rows
+
+
+    transform_load_context = preview_input_data
 
 
     def execute_code(self,code:str):
