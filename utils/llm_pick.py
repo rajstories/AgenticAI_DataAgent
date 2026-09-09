@@ -1,7 +1,16 @@
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from dotenv import load_dotenv
+
 load_dotenv()
+
+
+MODEL_MAP = {
+    "low": ChatOpenAI(model_name="gpt-5.6-luna", temperature=0, model_kwargs={"reasoning_effort": "none"}),
+    "medium": ChatOpenAI(model_name="gpt-5.6-terra", temperature=0, model_kwargs={"reasoning_effort": "none"}),
+    "high": ChatOpenAI(model_name="gpt-5.6-sol", temperature=0, model_kwargs={"reasoning_effort": "none"}),
+    "claude": ChatAnthropic(model_name="claude-sonnet-5"),
+}
 
 def pick_llm(level: str):
     """
@@ -13,25 +22,12 @@ def pick_llm(level: str):
     Returns:
         ChatOpenAI: The LLM instance to be used.
     """
-    if level.lower() == "low":
-        # llm = ChatAnthropic(model_name="claude-haiku-4-5", temperature=0)
-        llm = ChatOpenAI(model_name="gpt-5.6-luna", temperature=0,model_kwargs={
-        "reasoning_effort": "none"
-        })
-    elif level.lower() == "medium":
-        llm = ChatOpenAI(model_name="gpt-5.6-terra", temperature=0,model_kwargs={
-        "reasoning_effort": "none"
-    })
-    elif level.lower() == "high":
-        llm = ChatOpenAI(model_name="gpt-5.6-sol", temperature=0,model_kwargs={
-        "reasoning_effort": "none"
-    })
-    elif level.lower() == "claude":
-        llm = ChatAnthropic(model_name="claude-sonnet-5")
-    else:
+    key = level.lower()
+
+    if key not in MODEL_MAP:
         raise ValueError(f"Unsupported level: {level}")
 
-    return llm
+    return MODEL_MAP[key]
 
 if __name__ == "__main__":
     llm_obj = pick_llm("low")  
