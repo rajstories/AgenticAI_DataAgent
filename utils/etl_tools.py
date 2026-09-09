@@ -7,7 +7,7 @@ class ETLTools:
     def __init__(self):
         pass
 
-    def extract_load(self,url:str, output_folder:str, format:str):
+    def extract_load(self,url:str, output_folder:str, output_format:str):
         """
         This tool extracts the data from the API (url) and loads it into the
         the desired location (output_folder).
@@ -27,20 +27,25 @@ class ETLTools:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            data  = response.json()
+            payload = response.json()
 
-            filename = os.path.join(output_folder, f"extracted_data.{format}")
+            filename = os.path.join(output_folder, f"extracted_data.{output_format}")
             os.makedirs(output_folder, exist_ok=True)
 
-            df = pd.json_normalize(data['results'])
-            if format == "csv":
+            if isinstance(payload, dict) and "results" in payload:
+                records = payload["results"]
+            else:
+                records = payload
+
+            df = pd.json_normalize(records)
+            if output_format == "csv":
                 df.to_csv(filename, index=False)
-            elif format == "json":
+            elif output_format == "json":
                 df.to_json(filename, orient="records", lines=True)
-            elif format == "parquet":
+            elif output_format == "parquet":
                 df.to_parquet(filename, index=False)
             else:
-                return f"Unsupported format: {format}"
+                return f"Unsupported format: {output_format}"
 
             return f"Data successfully extracted and saved to {filename}"
         except requests.exceptions.RequestException as e:
