@@ -183,7 +183,7 @@ sql_agent_graph.add_edge("generate_sql", "is_safe_sql")
 
 # Codintional Edge Function
 def is_safe_sql_edge(state: AgentSchema) -> str:
-    is_safe = state.is_safe
+    is_safe = (state.is_safe or "").lower()
 
     if is_safe.lower() == "yes":
         return "execute_sql"
